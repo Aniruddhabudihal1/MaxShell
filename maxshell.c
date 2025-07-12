@@ -1,6 +1,4 @@
 #include "header.h"
-#include <stdio.h>
-#include <string.h>
 
 // main functions
 void stdin_input();
@@ -25,6 +23,11 @@ int main(int argc, char *argv[]) {
 
 void stdin_input() {
   char *input_buffer = (char *)malloc(1000);
+  int len_bait;
+  char *bait;
+  int cd_return;
+  char test[100];
+
   while (1) {
     printf("MaxShell> ");
     fgets(input_buffer, 1000, stdin);
@@ -36,6 +39,35 @@ void stdin_input() {
     if (strncmp(input_buffer, "q", 1) == 0 ||
         strncmp(input_buffer, "e", 1) == 0) {
       exit(0);
+    }
+
+    if (strncmp(input_buffer, "cd", 2) == 0) {
+      bait = strtok(input_buffer, " ");
+      bait = strtok(NULL, "\0");
+      for (int i = 0; i <= strlen(bait); i++) {
+        if (bait[i] == '\n') {
+          strcpy(&bait[i], "");
+        }
+      }
+      if (getcwd(test, 100) == NULL) {
+        fprintf(stderr,
+                "An error occured while getting the present working directory "
+                ": %s\n",
+                strerror(errno));
+      }
+      strcat(test, "/");
+      strcat(bait, "/");
+      strcat(test, bait);
+
+      // printf("%s", test);
+      if (chdir(test) != 0) {
+        fprintf(stderr, "something went wrong while changing directory : %s\n",
+                strerror(errno));
+      }
+    }
+
+    if (strncmp(input_buffer, "clear", 5) == 0) {
+      system("clear");
     }
 
     strcpy(input_buffer, "");
