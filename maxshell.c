@@ -1,4 +1,5 @@
 #include "header.h"
+#include <stdio.h>
 
 // main functions
 void stdin_input();
@@ -6,6 +7,7 @@ void batch_file_input();
 
 // functionality for the shell
 void ls(const char *buf);
+void echo(char *, char *);
 
 int main(int argc, char *argv[]) {
   if (argc == 1) {
@@ -24,24 +26,22 @@ int main(int argc, char *argv[]) {
 void stdin_input() {
   char *input_buffer = (char *)malloc(1000);
   int len_bait;
-  char *bait;
+  char *bait = (char *)malloc(150);
   int cd_return;
   char test[100];
 
   while (1) {
+    char *bait = (char *)malloc(150);
     printf("MaxShell> ");
     fgets(input_buffer, 1000, stdin);
 
     if (strncmp((const char *)input_buffer, "ls", 2) == 0) {
       ls(input_buffer);
-    }
-
-    if (strncmp(input_buffer, "q", 1) == 0 ||
-        strncmp(input_buffer, "e", 1) == 0) {
+    } else if (strncmp(input_buffer, "qui", 3) == 0 ||
+               strncmp(input_buffer, "exit", 4) == 0) {
+      printf("Simply lovely !\n");
       exit(0);
-    }
-
-    if (strncmp(input_buffer, "cd", 2) == 0) {
+    } else if (strncmp(input_buffer, "cd", 2) == 0) {
       bait = strtok(input_buffer, " ");
       bait = strtok(NULL, "\0");
       for (int i = 0; i <= strlen(bait); i++) {
@@ -59,18 +59,22 @@ void stdin_input() {
       strcat(bait, "/");
       strcat(test, bait);
 
-      // printf("%s", test);
       if (chdir(test) != 0) {
         fprintf(stderr, "something went wrong while changing directory : %s\n",
                 strerror(errno));
       }
-    }
-
-    if (strncmp(input_buffer, "clear", 5) == 0) {
+      strcpy(bait, "");
+    } else if (strncmp(input_buffer, "clear", 5) == 0) {
       system("clear");
+    } else if (strncmp(input_buffer, "echo", 4) == 0) {
+      echo(bait, input_buffer);
+    } else {
+      printf("MaxShell does not recognise : %sI gave my reasons !!\n",
+             input_buffer);
     }
 
     strcpy(input_buffer, "");
+    free(bait);
   }
   free(input_buffer);
 }
@@ -96,4 +100,12 @@ void ls(const char *buf) {
   } else {
     int signal = wait(NULL);
   }
+}
+
+void echo(char *bait, char *input_buffer) {
+  bait = strtok(input_buffer, " ");
+  for (bait = strtok(NULL, " "); bait != NULL; bait = strtok(NULL, " ")) {
+    printf("%s ", bait);
+  }
+  // strcpy(bait, "");
 }
