@@ -1,35 +1,24 @@
 #include "header.h"
+#include <stdatomic.h>
+#include <stdio.h>
 
 void stdin_input();
 void batch_file_input();
 
 int main(int argc, char *argv[]) {
-  if (argc == 2) {
-    batch_file_input();
-    return EXIT_SUCCESS;
-  } else if (argc == 1) {
+  if (argc == 1) {
     stdin_input();
-    return EXIT_SUCCESS;
-  } else if (strcmp(argv[1], "--help")) {
-    printf("Just run the executable if you want a stdin based input\nbut if "
-           "you want enter the commands through a batch file then run in the "
-           "form : <execcutable> <batch file>\n");
-    exit(0);
-  } else {
-    fprintf(stderr, "enter in the correct format\nexiting\n");
-    return EXIT_FAILURE;
+  } else if (strcmp(argv[1], "batch") == 0) {
+    batch_file_input();
+  } else if (strcmp(argv[1], "help") == 0) {
+    fprintf(stderr,
+            "for stdin input just run the executable\nFor sending in a batch "
+            "file, type in the name of the batch file as the second input\n");
+    return 1;
   }
+  return 0;
 }
 
-void stdin_input() {
-  char *buffer = (char *)malloc(1000);
-  size_t buf_size = 1000;
-  while (1) {
-    printf("maxshell>");
-    if (getline(&buffer, &buf_size, stdin) == -1) {
-      fprintf(stderr, "something went wrong while reading the input\n");
-    }
-  }
-}
+void stdin_input() { printf("Stdin input\n"); }
 
-void batch_file_input();
+void batch_file_input() { printf("batch file input\n"); }
