@@ -1,13 +1,16 @@
 #include "header.h"
+#include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
 
 // main functions
 void stdin_input();
 void batch_file_input();
 
 // functionality for the shell
-void ls(const char *buf);
+void ls();
 void echo(char *, char *);
+void redirect(char *, char *);
 
 int main(int argc, char *argv[]) {
   if (argc == 1) {
@@ -25,18 +28,30 @@ int main(int argc, char *argv[]) {
 
 void stdin_input() {
   char *input_buffer = (char *)malloc(1000);
-  int len_bait;
-  char *bait = (char *)malloc(150);
   int cd_return;
   char test[100];
-
+  char *bait;
   while (1) {
-    char *bait = (char *)malloc(150);
     printf("MaxShell> ");
-    fgets(input_buffer, 1000, stdin);
 
-    if (strncmp((const char *)input_buffer, "ls", 2) == 0) {
-      ls(input_buffer);
+    char *mini_bait1;
+    int redirection_flag = 0;
+
+    fgets(input_buffer, 1000, stdin);
+    for (int i = 0; i < strlen(input_buffer); i++) {
+      if (strncmp(&input_buffer[i], ">", 1) == 0) {
+        redirection_flag = 1;
+      } else if (strncmp(&input_buffer[i], "\n", 1) == 0) {
+        strcpy(&input_buffer[i], "");
+      }
+    }
+
+    if (redirection_flag) {
+      bait = strtok(input_buffer, " > ");
+      mini_bait1 = strtok(NULL, " > ");
+      redirect(bait, mini_bait1);
+    } else if (strncmp((const char *)input_buffer, "ls", 2) == 0) {
+      ls();
     } else if (strncmp(input_buffer, "qui", 3) == 0 ||
                strncmp(input_buffer, "exit", 4) == 0) {
       printf("Simply lovely !\n");
@@ -72,16 +87,15 @@ void stdin_input() {
       printf("MaxShell does not recognise : %sI gave my reasons !!\n",
              input_buffer);
     }
-
+    strcpy(bait, "");
     strcpy(input_buffer, "");
-    free(bait);
   }
   free(input_buffer);
 }
 
 void batch_file_input() { printf("batch file input\n"); }
 
-void ls(const char *buf) {
+void ls() {
   // need to add more functionality where it can call ls for any directory
   pid_t forking_status = fork();
   pid_t exec_status;
@@ -92,6 +106,7 @@ void ls(const char *buf) {
     char *arguments = strdup("/usr/bin/ls");
     char *arr[] = {arguments, NULL};
     exec_status = execv(arr[0], arr);
+
     if (exec_status == -1) {
       fprintf(stderr, "something went while running ls : %s\n",
               strerror(errno));
@@ -107,5 +122,27 @@ void echo(char *bait, char *input_buffer) {
   for (bait = strtok(NULL, " "); bait != NULL; bait = strtok(NULL, " ")) {
     printf("%s ", bait);
   }
-  // strcpy(bait, "");
+}
+
+void redirect(char *bait1, char *bait2) {
+  int file_des = open(bait2, O_CREAT | O_RDWR, 0777);
+  char *buf;
+  truncate(bait2, 0);
+  if (strncmp(bait1, "ls", 2) == 0) {
+
+    int file_des2 = dup2(file_des, STDOUT_FILENO);
+    close(file_des);
+    if (file_des2 < 0) {
+      fprintf(stderr, "something went wrong while creating the duplicate file "
+                      "descriptor\n");
+      exit(1);
+    }
+    ls();
+    if (read(file_des2, buf, 100) < 0) {
+      fprintf(stderr, "read error : %s", strerror(errno));
+      exit(1);
+    }
+    write(file_des2, buf, sizeof(buf));
+    close(file_des2);
+  }
 }
