@@ -1,7 +1,4 @@
 #include "header.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
 
 // main functions
 void stdin_input();
@@ -21,6 +18,9 @@ int main(int argc, char *argv[]) {
     fprintf(stderr,
             "for stdin input just run the executable\nFor sending in a batch "
             "file, type in the name of the batch file as the second input\n");
+    return 0;
+  } else {
+    printf("something went wrong\n");
     return 1;
   }
   return 0;
@@ -87,8 +87,8 @@ void stdin_input() {
       printf("MaxShell does not recognise : %sI gave my reasons !!\n",
              input_buffer);
     }
-    strcpy(bait, "");
-    strcpy(input_buffer, "");
+    strncpy(bait, "", 0);
+    strncpy(input_buffer, "", 0);
   }
   free(input_buffer);
 }
