@@ -1,9 +1,3 @@
-Yes, you can **just copy and paste** the content into a file named `README.md` in your project directory — GitHub will automatically render it when someone visits the repo.
-
-Here’s the same version **without emojis**, cleaned up for professional usage:
-
----
-
 ````markdown
 # MaxShell — A Formula One Inspired Unix Shell
 
