@@ -1,4 +1,4 @@
-````markdown
+
 # MaxShell — A Formula One Inspired Unix Shell
 
 Welcome to **MaxShell**, a custom Unix shell inspired by the precision and dominance of F1 driver **Max Verstappen**. This shell project is a personal implementation of basic shell functionalities, built in C, mimicking real-world shell behavior with a fun F1 twist.
@@ -120,7 +120,6 @@ This project is for educational purposes and follows no specific license yet. Co
 **Aniruddha Budihal**
 Inspired by the power of C and the speed of Formula One.
 
-```
 
 ---
 
